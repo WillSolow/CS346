@@ -8,21 +8,21 @@
 
 % TO RUN: Press F5
 
-% simulation length and change in time
+% simulation length and change in time (in seconds)
 sim_length = 3;
 dt = .001;
 num_iterations = sim_length/dt;
 
 % Initializing constants
 I_max = 15;
-I = 0;
-C_M = .1;
+I = 0; % applied current
+C_M = .1; % capacitance
 
 % initial voltage and gating probabilities
-V_init = -65;
-n_init = .317;
-m_init = .05;
-h_init = .6;
+V_init = -65; % action potential (mV)
+n_init = .317; % potassium activation gating probability
+m_init = .05; % sodium activation gating probability
+h_init = .6; % sodium inactivation gating probability
 
 % Gating constants. Controls when the gates open and close based on the
 % voltage
@@ -58,9 +58,12 @@ h(1) = h_init;
 % calculating opening and closing rate constants
 % used in calculating the probablities of a gate being open for 
 % n, m, and h, the gates of K, Na, and L
+
+% opening rate constants
 a_n = @(V) .01  * (V+55) / (1 - exp(-(V+55) / 10));
 a_m = @(V) .1   * (V+40) / (1 - exp(-(V+40) / 10));
 a_h = @(V) .07  *               exp(-(V+65) / 20) ;
+% closing rate constants
 b_n = @(V) .125 *               exp(-(V+65) / 80) ;
 b_m = @(V) 4    *               exp(-(V+65) / 18) ;
 b_h = @(V) 1             / (1 + exp(-(V+35) / 10));

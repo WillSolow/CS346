@@ -10,7 +10,7 @@
 
 % TO RUN: Press F5
 
-% simulation length and change in time
+% simulation length and change in time (in seconds)
 sim_length = 3;
 dt = .001;
 num_iterations = sim_length/dt;
@@ -26,14 +26,14 @@ P_O = 1;
 
 % Initializing constants
 I_max = 15;
-I = 0;
-C_M = .1;
+I = 0; % applied current
+C_M = .1; % capacitance
 
 % initial voltage and gating probabilities
-V_init = -65;
-n_init = .317;
-m_init = .05;
-h_init = .6;
+V_init = -65; % action potential (mV)
+n_init = .317; % potassium activation gating probability
+m_init = .05; % sodium activation gating probability
+h_init = .6; % sodium inactivation gating probability
 
 % initial concentrations of Na and K 
 Na_in_init = 15;
@@ -105,6 +105,8 @@ dVdt = @(V, n, m, h, I, Na_O, K_O, P_O) (I - K_O*I_K(V,n) - Na_O*I_Na(V,m,h) - .
 % used to calculate the change in concentrations of K and Na
 % for K, calculating positive change of concentration outside
 % for Na, calcualting positive change of concentration outside
+
+% TODO why the .4, .6
 dKdt = @(V, n, K_O, P_O) -I_K(V,n)*K_O - I_L(V) + .4*P_O*I_P;
 dNadt = @(V, m, h, Na_O, P_O) -I_Na(V,m,h)*Na_O - .6*P_O*I_P;
 
