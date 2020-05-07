@@ -45,8 +45,8 @@ K_out_init = 5.5;
 % Gating constants. Controls when the gates open and close based on the
 % voltage
 Na_open = -55;
-Na_close = 49.3;
-K_open = 49.3;
+Na_close = 50;
+K_open = 50;
 
 % displacements from equilibrium potential K: potassium, Na: sodium, L: leakage
 % used in calculating the currents of K, Na, and L
