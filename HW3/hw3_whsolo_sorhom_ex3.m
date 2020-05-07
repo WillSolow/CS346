@@ -106,9 +106,8 @@ dVdt = @(V, n, m, h, I, Na_O, K_O, P_O) (I - K_O*I_K(V,n) - Na_O*I_Na(V,m,h) - .
 % for K, calculating positive change of concentration outside
 % for Na, calcualting positive change of concentration outside
 
-% TODO why the .4, .6
-dKdt = @(V, n, K_O, P_O) -I_K(V,n)*K_O - I_L(V) + .4*P_O*I_P;
-dNadt = @(V, m, h, Na_O, P_O) -I_Na(V,m,h)*Na_O - .6*P_O*I_P;
+dKdt = @(V, n, K_O, P_O) -I_K(V,n)*K_O - I_L(V) - 2*P_O*I_P;
+dNadt = @(V, m, h, Na_O, P_O) -I_Na(V,m,h)*Na_O + 3*P_O*I_P;
 
 % when to start and end the current
 curr_start = .5;
