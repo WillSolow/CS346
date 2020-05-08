@@ -33,8 +33,8 @@ K_open = 49.3;
 % default is that both channels start as closed - 0 is closed, 1 is open
 % used to keep track if the voltage gated channels are open to control
 % current
-Na_O = 0;
-K_O = 0;
+Na_On = 0;
+K_On = 0;
 
 % displacements from equilibrium potential K: potassium, Na: sodium, L: leakage
 % used in calculating the currents of K, Na, and L
@@ -82,7 +82,7 @@ I_L  = @(V) g_L * (V-V_L);
 I_P = g_L * (V_init-V_L);
 
 % calculating rate of change of voltage based on currents
-dVdt = @(V, n, m, h, I, Na_O, K_O) (I - K_O*I_K(V,n) - Na_O*I_Na(V,m,h) - ...
+dVdt = @(V, n, m, h, I, Na_On, K_On) (I - K_On*I_K(V,n) - Na_On*I_Na(V,m,h) - ...
     I_L(V) + I_P) / C_M;
 
 % when to start and end the current
@@ -97,25 +97,25 @@ for i=1:num_iterations
     
     % compute RK4 estimations
     % del 1 estimates
-    dV1 = dVdt(V(i)      , n(i)      , m(i)      , h(i)      , I, Na_O, K_O)*dt;
+    dV1 = dVdt(V(i)      , n(i)      , m(i)      , h(i)      , I, Na_On, K_On)*dt;
     dN1 = dNdt(V(i)      , n(i)      , m(i)      , h(i)      )*dt;
     dM1 = dMdt(V(i)      , n(i)      , m(i)      , h(i)      )*dt;
     dH1 = dHdt(V(i)      , n(i)      , m(i)      , h(i)      )*dt;
     
     % del 2 estimates
-    dV2 = dVdt(V(i)+dV1/2, n(i)+dN1/2, m(i)+dM1/2, h(i)+dH1/2, I, Na_O, K_O)*dt;
+    dV2 = dVdt(V(i)+dV1/2, n(i)+dN1/2, m(i)+dM1/2, h(i)+dH1/2, I, Na_On, K_On)*dt;
     dN2 = dNdt(V(i)+dV1/2, n(i)+dN1/2, m(i)+dM1/2, h(i)+dH1/2)*dt;
     dM2 = dMdt(V(i)+dV1/2, n(i)+dN1/2, m(i)+dM1/2, h(i)+dH1/2)*dt;
     dH2 = dHdt(V(i)+dV1/2, n(i)+dN1/2, m(i)+dM1/2, h(i)+dH1/2)*dt;
     
     %del 3 estimates
-    dV3 = dVdt(V(i)+dV2/2, n(i)+dN2/2, m(i)+dM2/2, h(i)+dH2/2, I, Na_O, K_O)*dt;
+    dV3 = dVdt(V(i)+dV2/2, n(i)+dN2/2, m(i)+dM2/2, h(i)+dH2/2, I, Na_On, K_On)*dt;
     dN3 = dNdt(V(i)+dV2/2, n(i)+dN2/2, m(i)+dM2/2, h(i)+dH2/2)*dt;
     dM3 = dMdt(V(i)+dV2/2, n(i)+dN2/2, m(i)+dM2/2, h(i)+dH2/2)*dt;
     dH3 = dHdt(V(i)+dV2/2, n(i)+dN2/2, m(i)+dM2/2, h(i)+dH2/2)*dt;
     
     % del 4 estimates
-    dV4 = dVdt(V(i)+dV3  , n(i)+dN3  , m(i)+dM3  , h(i)+dH3  , I, Na_O, K_O)*dt;
+    dV4 = dVdt(V(i)+dV3  , n(i)+dN3  , m(i)+dM3  , h(i)+dH3  , I, Na_On, K_On)*dt;
     dN4 = dNdt(V(i)+dV3  , n(i)+dN3  , m(i)+dM3  , h(i)+dH3  )*dt;
     dM4 = dMdt(V(i)+dV3  , n(i)+dN3  , m(i)+dM3  , h(i)+dH3  )*dt;
     dH4 = dHdt(V(i)+dV3  , n(i)+dN3  , m(i)+dM3  , h(i)+dH3  )*dt;
@@ -131,9 +131,9 @@ for i=1:num_iterations
     
     % check to see if Na and K gates are open/closed
     % Voltage is above base threshold and below max, Ka channel not open
-    Na_O = (V(i+1) > Na_open & V(i+1) < Na_close) & ~(K_O);
+    Na_On = (V(i+1) > Na_open & V(i+1) < Na_close) & ~(K_On);
     % Voltage is above threshold or voltage is decreasing
-    K_O = ((V(i+1) > K_open) | (V(i+1)-V(i) < 0));
+    K_On = ((V(i+1) > K_open) | (V(i+1)-V(i) < 0));
        
 end
 

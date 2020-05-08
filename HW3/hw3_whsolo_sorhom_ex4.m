@@ -19,11 +19,11 @@ num_iterations = sim_length/dt;
 % default is that both channels start as closed - 0 is closed, 1 is open
 % used to keep track if the voltage gated channels are open to control
 % current
-Na_O = 0;
-K_O = 0;
+Na_On = 0;
+K_On = 0;
 % used to turn pump on and off. 0 is off, 1 is on default starts at on as
 % initial concentrations are in desired range.
-P_O = 1;
+P_On = 1;
 
 % Initializing constants
 I_max = 15;
@@ -100,15 +100,15 @@ I_L  = @(V) g_L * (V-V_L);
 I_P = g_L * (V_init-V_L);
 
 % calculating rate of change of voltage based on currents
-dVdt = @(V, n, m, h, I, Na_O, K_O, P_O) (I - K_O*I_K(V,n) - Na_O*I_Na(V,m,h) - ...
-    I_L(V) + P_O*I_P) / C_M;
+dVdt = @(V, n, m, h, I, Na_On, K_On, P_On) (I - K_On*I_K(V,n) - Na_On*I_Na(V,m,h) - ...
+    I_L(V) + P_On*I_P) / C_M;
 
 % used to calculate the change in concentrations of K and Na
 % for K, calculating positive change of concentration outside
 % for Na, calcualting positive change of concentration outside
 
-dKdt = @(V, n, K_O, P_O) -I_K(V,n)*K_O - I_L(V) - 2*P_O*I_P;
-dNadt = @(V, m, h, Na_O, P_O) -I_Na(V,m,h)*Na_O + 3*P_O*I_P;
+dKdt = @(V, n, K_On, P_On) -I_K(V,n)*K_On - I_L(V) - 2*P_On*I_P;
+dNadt = @(V, m, h, Na_On, P_On) -I_Na(V,m,h)*Na_On + 3*P_On*I_P;
 
 % when to start and end the current
 curr_start = .5;
@@ -122,40 +122,40 @@ for i=1:num_iterations
     
     % compute RK4 estimations
     % del 1 estimates
-    dV1 = dVdt(V(i)      , n(i)      , m(i)      , h(i)      , I, Na_O, ...
-        K_O, P_O)*dt;
+    dV1 = dVdt(V(i)      , n(i)      , m(i)      , h(i)      , I, Na_On, ...
+        K_On, P_On)*dt;
     dN1 = dNdt(V(i)      , n(i)      , m(i)      , h(i)      )*dt;
     dM1 = dMdt(V(i)      , n(i)      , m(i)      , h(i)      )*dt;
     dH1 = dHdt(V(i)      , n(i)      , m(i)      , h(i)      )*dt;
-    dK1 = dKdt(V(i)      , n(i)                  , K_O, P_O)*dt;
-    dNa1=dNadt(V(i)      , m(i)      , h(i)      , Na_O,P_O)*dt;
+    dK1 = dKdt(V(i)      , n(i)                  , K_On, P_On)*dt;
+    dNa1=dNadt(V(i)      , m(i)      , h(i)      , Na_On,P_On)*dt;
     
     % del 2 estimates
-    dV2 = dVdt(V(i)+dV1/2, n(i)+dN1/2, m(i)+dM1/2, h(i)+dH1/2, I, Na_O, ...
-        K_O, P_O)*dt;
+    dV2 = dVdt(V(i)+dV1/2, n(i)+dN1/2, m(i)+dM1/2, h(i)+dH1/2, I, Na_On, ...
+        K_On, P_On)*dt;
     dN2 = dNdt(V(i)+dV1/2, n(i)+dN1/2, m(i)+dM1/2, h(i)+dH1/2)*dt;
     dM2 = dMdt(V(i)+dV1/2, n(i)+dN1/2, m(i)+dM1/2, h(i)+dH1/2)*dt;
     dH2 = dHdt(V(i)+dV1/2, n(i)+dN1/2, m(i)+dM1/2, h(i)+dH1/2)*dt;
-    dK2 = dKdt(V(i)+dV1/2, n(i)+dN1/2            , K_O, P_O)*dt;
-    dNa2=dNadt(V(i)+dV1/2, m(i)+dM1/2, h(i)+dH1/2, Na_O, P_O)*dt;
+    dK2 = dKdt(V(i)+dV1/2, n(i)+dN1/2            , K_On, P_On)*dt;
+    dNa2=dNadt(V(i)+dV1/2, m(i)+dM1/2, h(i)+dH1/2, Na_On, P_On)*dt;
     
     %del 3 estimates
-    dV3 = dVdt(V(i)+dV2/2, n(i)+dN2/2, m(i)+dM2/2, h(i)+dH2/2, I, Na_O, ...
-        K_O, P_O)*dt;
+    dV3 = dVdt(V(i)+dV2/2, n(i)+dN2/2, m(i)+dM2/2, h(i)+dH2/2, I, Na_On, ...
+        K_On, P_On)*dt;
     dN3 = dNdt(V(i)+dV2/2, n(i)+dN2/2, m(i)+dM2/2, h(i)+dH2/2)*dt;
     dM3 = dMdt(V(i)+dV2/2, n(i)+dN2/2, m(i)+dM2/2, h(i)+dH2/2)*dt;
     dH3 = dHdt(V(i)+dV2/2, n(i)+dN2/2, m(i)+dM2/2, h(i)+dH2/2)*dt;
-    dK3 = dKdt(V(i)+dV2/2, n(i)+dN2/2            , K_O, P_O)*dt;
-    dNa3=dNadt(V(i)+dV2/2, m(i)+dM2/2, h(i)+dH2/2, Na_O, P_O)*dt;
+    dK3 = dKdt(V(i)+dV2/2, n(i)+dN2/2            , K_On, P_On)*dt;
+    dNa3=dNadt(V(i)+dV2/2, m(i)+dM2/2, h(i)+dH2/2, Na_On, P_On)*dt;
     
     % del 4 estimates
-    dV4 = dVdt(V(i)+dV3  , n(i)+dN3  , m(i)+dM3  , h(i)+dH3  , I, Na_O, ...
-        K_O, P_O)*dt;
+    dV4 = dVdt(V(i)+dV3  , n(i)+dN3  , m(i)+dM3  , h(i)+dH3  , I, Na_On, ...
+        K_On, P_On)*dt;
     dN4 = dNdt(V(i)+dV3  , n(i)+dN3  , m(i)+dM3  , h(i)+dH3  )*dt;
     dM4 = dMdt(V(i)+dV3  , n(i)+dN3  , m(i)+dM3  , h(i)+dH3  )*dt;
     dH4 = dHdt(V(i)+dV3  , n(i)+dN3  , m(i)+dM3  , h(i)+dH3  )*dt;
-    dK4 = dKdt(V(i)+dV3  , n(i)+dN3              , K_O, P_O)*dt;
-    dNa4=dNadt(V(i)+dV3  , m(i)+dM3  , h(i)+dH3  , Na_O, P_O)*dt;
+    dK4 = dKdt(V(i)+dV3  , n(i)+dN3              , K_On, P_On)*dt;
+    dNa4=dNadt(V(i)+dV3  , m(i)+dM3  , h(i)+dH3  , Na_On, P_On)*dt;
     
     % compute value at next time step
     V(i+1) = V(i) + (dV1 + 2*dV2 + 2*dV3 + dV4)/6;
@@ -174,13 +174,13 @@ for i=1:num_iterations
     
     % check to see if Na and K gates are open/closed
     % Voltage is above base threshold and below max, Ka channel not open
-    Na_O = (V(i+1) > Na_open & V(i+1) < Na_close) & ~(K_O);
+    Na_On = (V(i+1) > Na_open & V(i+1) < Na_close) & ~(K_On);
     % Voltage is above threshold or voltage is decreasing
-    K_O = ((V(i+1) > K_open) | (V(i+1)-V(i) < 0));
+    K_On = ((V(i+1) > K_open) | (V(i+1)-V(i) < 0));
     
     % turn pump on/off
     % on (1) if K conc outside and Na conc inside are both positive
-    P_O = (K_out(i+1) > 0 & Na_in(i+1) > 0);
+    P_On = (K_out(i+1) > 0 & Na_in(i+1) > 0);
 end
 
 figure;
