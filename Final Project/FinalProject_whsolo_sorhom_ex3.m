@@ -1,4 +1,4 @@
-% FinalProject_whsolo_sorhom_ex1.m
+% FinalProject_whsolo_sorhom_ex3.m
 % Will Solow and Skye Rhomberg
 % CS346 - Spring 2020
 % Final Project - Wildfire Simulation
@@ -7,7 +7,7 @@
 % the model described in section 10.3 with the addition of lightning
 % strikes, a spread function based off of the amount of trees burning
 % around it, and tree growth. Also, this simulation models steady wind from
-% a set direction and rainfall
+% a set direction and global rainfall
 
 num_iterations = 50;
 neighborhood_size = 4;
@@ -23,6 +23,8 @@ prob_tree = .8;
 prob_burning = .0005;
 % probability of a tree not catching fire at a time step
 prob_immune = .25;
+% used for rainfall vs no rainfall, default is no rainfall
+immunity = prob_immune;
 % the probability that a tree grows on an empty cell
 prob_grow = .01;
 % the probability that a lightning strikes a tree
@@ -32,7 +34,15 @@ prob_lightning = .0001;
 % column 1 is strength on 0-1 scale and column 2 is direction in degrees
 % 0-360. 0 degrees is a western wind (going from west to east)
 % 90 degrees is wind coming from the south (going south to north)
-wind_dir = [1 45];
+wind_dir = [0 0];
+
+% simulate global rainfall based on start and end times. rainfall is
+% modeled by increasing immunity of trees to catching on fire
+rainfall_immunity = .5;
+% array of starts and stops in rainfall. Can have as many as want as long 
+% as less than num_iterations
+rainfall_switches = [10 30];
+rainfall_on(1) = 0;
 
 % width and length of forest
 forest_rows = 60; % height of the forest 
@@ -61,8 +71,18 @@ for i = 1:num_iterations
     forest = forest_list{i};
     ext_forest = ext_forest_list{i};
     
+    % switch between rainfall and no rainfall globally by switching
+    % immunity of trees burning
+    if sum(rainfall_switches == i) > 0
+        if immunity == prob_immune
+            immunity = rainfall_immunity;
+        else
+            immunity = prob_immune;
+        end
+    end
+    
     % apply spread function to calculate tree burning
-    forest = spread(forest,ext_forest,forest_rows,forest_cols,prob_immune, ...
+    forest = spread(forest,ext_forest,forest_rows,forest_cols,immunity, ...
         prob_grow, prob_lightning, neighborhood_size, wind_dir, EMPTY, TREE, BURNING);
     
     % update extended forest
@@ -71,6 +91,8 @@ for i = 1:num_iterations
     % update grid lists
     forest_list{i+1} = forest;
     ext_forest_list{i+1} = ext_forest;
+    % get rainfall array for graphing (1) if rainfall is on
+    rainfall_on(i+1) = (immunity == rainfall_immunity);
 end
 
 % initializes the forest to a square grid with inputs for the probability
@@ -98,20 +120,14 @@ function forest = spread(forest,ext_forest,forest_rows,forest_cols,prob_immune, 
     ext_forest_rows = forest_rows+2;
     ext_forest_cols = forest_cols+2;
     
-    % create 8 offset grids for Moore neighborhood the size of forest from
+    % create 4 offset grids for Von Neumann neighborhood the size of forest from
     % extended grid to be used to add together to find the burning neighbors
     % every 1 is exactly a burning tree.
     north_grid = (ext_forest(1:ext_forest_rows-2, 2:ext_forest_cols-1) == BURNING);
     south_grid = (ext_forest(3:ext_forest_rows, 2:ext_forest_cols-1) == BURNING);
     west_grid = (ext_forest(2:ext_forest_rows-1, 1:ext_forest_cols-2) == BURNING);
     east_grid = (ext_forest(2:ext_forest_rows-1, 3:ext_forest_cols) == BURNING);
-    
-    % commented out as we are currently not using Moore neighborhoods
-    %ne_grid = (ext_forest(1:ext_forest_rows-2, 3:ext_forest_cols) == BURNING);
-    %se_grid = (ext_forest(3:ext_forest_rows, 3:ext_forest_cols) == BURNING);
-    %nw_grid = (ext_forest(1:ext_forest_rows-2, 1:ext_forest_cols-2) == BURNING);
-    %sw_grid = (ext_forest(3:ext_forest_rows, 1:ext_forest_cols-2) == BURNING);
-    
+
     % calculate wind direction offset for each directional grid
     % the grid value (no wind) plus the directional strentgh times actual
     % direction
@@ -120,25 +136,14 @@ function forest = spread(forest,ext_forest,forest_rows,forest_cols,prob_immune, 
     % cells
     % directions are all normalized with cosine and offsetted by their
     % direction with respect to the center cell
-    north_grid = north_grid + ((wind_dir(1) * (cos((wind_dir(2)-270)*pi/180)...
-        + sin((wind_dir(2)-270)*pi/180))) .* (north_grid > 0));
-    south_grid = south_grid + ((wind_dir(1) * (cos((wind_dir(2)-90)*pi/180)...
-        + sin((wind_dir(2)-90)*pi/180))) .* (south_grid > 0));
-    west_grid = west_grid + ((wind_dir(1) * (cos(wind_dir(2)*pi/180)...
-        + sin(wind_dir(2)*pi/180))) .* (west_grid > 0));
-    east_grid = east_grid + ((wind_dir(1) * (cos((wind_dir(2)-180)*pi/180)...
-        + sin((wind_dir(2)-180)*pi/180))).* (east_grid > 0));
-    
-    % commented out as we are not using Moore neighborhoods
-    %ne_grid = (ne_grid + ((wind_dir(1) * cos((wind_dir(2)-45 )*pi/180)) .* (ne_grid > 0)));
-    %se_grid = (se_grid + ((wind_dir(1) * cos((wind_dir(2)-315)*pi/180)) .* (se_grid > 0)));
-    %nw_grid = (nw_grid + ((wind_dir(1) * cos((wind_dir(2)-135)*pi/180)) .* (nw_grid > 0)));
-    %sw_grid = (sw_grid + ((wind_dir(1) * cos((wind_dir(2)-225)*pi/180)) .* (sw_grid > 0)));
+    north_grid = north_grid + ((wind_dir(1) * cos((wind_dir(2)-270)*pi/180)) .* (north_grid > 0));
+    south_grid = south_grid + ((wind_dir(1) * cos((wind_dir(2)-90)*pi/180)) .* (south_grid > 0));
+    west_grid = west_grid + ((wind_dir(1) * cos(wind_dir(2)*pi/180)) .* (west_grid > 0));
+    east_grid = east_grid + ((wind_dir(1) * cos((wind_dir(2)-180)*pi/180)).* (east_grid > 0));
     
     % sum all burning neighbors to receive value 0-neighborhood_size to be used in
     % probability analysis of burning
-    burning_neighbors = north_grid + south_grid + east_grid + west_grid; %...
-        %+ ne_grid + se_grid + nw_grid + sw_grid;
+    burning_neighbors = north_grid + south_grid + east_grid + west_grid; 
     
     % calculate what trees are remaining, if a tree is burning it goes to
     % empty
