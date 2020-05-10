@@ -23,8 +23,8 @@ prob_burning = .0005;
 prob_immune = .25;
 
 % width and length of forest
-forest_rows = 30; % height of the forest 
-forest_cols = 20; % width of the forest
+forest_rows = 60; % height of the forest 
+forest_cols = 60; % width of the forest
 x = 1:forest_rows;
 y = 1:forest_cols;
 

@@ -17,12 +17,14 @@ function [] = show_forest(list,interval)
                            1.00 .341 .165];
                        
         colormap(forest_colormap);
+        
             
         % gets data to be plotted
         data = list{i};
        
        % plot the image
-       imagesc(data);
+       % keeps the data within range EMPTY, TREE, BURNING
+       imagesc(data, [0 2]);
        title(sprintf('Wild fire spread\n Frame: %d',i));
        hold;
        axis equal;
