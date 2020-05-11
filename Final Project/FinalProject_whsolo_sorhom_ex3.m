@@ -155,7 +155,7 @@ function forest = spread(forest,ext_forest,forest_rows,forest_cols,prob_immune, 
     % calculates array of all cells with no immunity and burning neighbors
     % note that a tree may or may not be in one of these cells
     nonimmune_cells = (rand(forest_rows,forest_cols) < ((1- prob_immune)...
-        + (prob_immune / (neighborhood_size)) * burning_neighbors));
+        + (prob_immune / neighborhood_size) * burning_neighbors));
     lightning_cells = (rand(forest_rows,forest_cols) < prob_lightning);
     
     % calculates which new cells are going to be burning based on neighbors
