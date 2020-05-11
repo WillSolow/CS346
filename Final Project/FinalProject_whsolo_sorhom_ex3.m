@@ -30,11 +30,11 @@ prob_grow = .01;
 % the probability that a lightning strikes a tree
 prob_lightning = .0001;
 
-% wind direction as a directional vector in polar coordinates
-% column 1 is strength on 0-1 scale and column 2 is direction in degrees
-% 0-360. 0 degrees is a western wind (going from west to east)
-% 90 degrees is wind coming from the south (going south to north)
-wind_dir = [0 0];
+% wind direction as a directional vector
+% first coordinate is east-west, where positive is westerly wind
+% second coordinate is north-south, where positive is southerly wind
+% values between -1 and 1
+wind_dir = [0.75 -0.4];
 
 % simulate global rainfall based on start and end times. rainfall is
 % modeled by increasing immunity of trees to catching on fire
@@ -133,10 +133,10 @@ function forest = spread(forest,ext_forest,forest_rows,forest_cols,prob_immune, 
     % cells
     % directions are all normalized with cosine and offsetted by their
     % direction with respect to the center cell
-    north_grid = north_grid + ((wind_dir(1) * cos((wind_dir(2)-270)*pi/180)) .* (north_grid > 0));
-    south_grid = south_grid + ((wind_dir(1) * cos((wind_dir(2)-90)*pi/180)) .* (south_grid > 0));
-    west_grid = west_grid + ((wind_dir(1) * cos(wind_dir(2)*pi/180)) .* (west_grid > 0));
-    east_grid = east_grid + ((wind_dir(1) * cos((wind_dir(2)-180)*pi/180)).* (east_grid > 0));
+    north_grid = north_grid - (wind_dir(2) .* (north_grid > 0));
+    south_grid = south_grid + (wind_dir(2) .* (south_grid > 0));
+    west_grid = west_grid + (wind_dir(1) .* (west_grid > 0));
+    east_grid = east_grid - (wind_dir(1) .* (east_grid > 0));
     
     % sum all burning neighbors to receive value 0-neighborhood_size to be used in
     % probability analysis of burning
