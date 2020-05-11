@@ -73,9 +73,14 @@ for i = 1:num_iterations
     
     % switch between rainfall and no rainfall globally by switching
     % immunity of trees burning
-    if any(rainfall_switches == i)
+    if sum(rainfall_switches == i) > 0
+        %if immunity == prob_immune
+        %    immunity = rainfall_immunity;
+        %else
+        %    immunity = prob_immune;
+        %end
         immunity = ((immunity == rainfall_immunity)*prob_immune) ...
-            + ((immunity == prob_immune)*rainfall_immunity);
+            + (immunity == prob_immune)*rainfall_immunity))
     end
     
     % apply spread function to calculate tree burning
