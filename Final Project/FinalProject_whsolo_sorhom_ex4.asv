@@ -21,7 +21,7 @@ ANCIENT = 4; % the cell contains a large ancient tree
 % probability of a tree occupying a cell. controls density of forest
 prob_tree = .6;
 % the probability that a new tree grows
-prob_grow = .02;
+prob_grow = .0001;
 
 % the speed at which the forest grows 
 forest_growth = .1;
@@ -193,7 +193,8 @@ function [forest,burning] = spread(forest,burning,ext_burning,forest_rows,...
     burning_trees = (nonimmune_burning_cells + burning) .* (burnt_forest > 0);
     
     % calculate tree growth based off of the rate of growth function and if
-    % the cell is burning a tree or empty cannot grow
+    % the cell is burning a tree cannot grow
+    
     tree_growth = (rand(forest_rows,forest_cols) < rate_of_growth(forest_growth,forest,ANCIENT)...
         .* (~burning) .* (forest > 0));
     
