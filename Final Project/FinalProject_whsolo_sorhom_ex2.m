@@ -8,8 +8,8 @@
 % strikes, a spread function based off of the amount of trees burning
 % around it, and tree growth
 
-num_iterations = 50;
-neighborhood_size = 4;
+num_iterations = 50; % simulation length
+nbhd_size = 4; % neighborhood size (4 for von neumann, 8 for moore)
 
 % Initializing Constants
 EMPTY = 0; % the cell is empty and not containing tree
@@ -30,8 +30,6 @@ prob_lightning = .0001;
 % width and length of forest
 forest_rows = 60; % height of the forest 
 forest_cols = 60; % width of the forest
-x = 1:forest_rows;
-y = 1:forest_cols;
 
 % initialize random seed so that results can be reproduced
 seed = 1;
@@ -49,14 +47,16 @@ ext_forest(2:forest_rows+1,2:forest_cols+1) = forest;
 forest_list{1} = forest;
 ext_forest_list{1} = ext_forest;
 
+% main simulation loop
 for i = 1:num_iterations
     % get current forest and extended forest grid
     forest = forest_list{i};
     ext_forest = ext_forest_list{i};
     
     % apply spread function to calculate tree burning
-    forest = spread(forest,ext_forest,forest_rows,forest_cols,prob_immune, ...
-        prob_grow, prob_lightning, neighborhood_size, EMPTY, TREE, BURNING);
+    forest = spread(forest,ext_forest,forest_rows,forest_cols, ...
+        prob_immune,prob_grow,prob_lightning,neighborhood_size, ...
+        EMPTY, TREE, BURNING);
     
     % update extended forest
     ext_forest(2:forest_rows+1,2:forest_cols+1) = forest;
@@ -68,7 +68,11 @@ end
 
 % initializes the forest to a square grid with inputs for the probability
 % of tree density and the probability that a tree is burning
-function forest = init_forest(forest_rows, forest_cols , prob_tree, prob_burning)
+% inputs:
+%   forest_rows,forest_cols : size of simulated forest
+%   prob_tree : initial chance of a cell having a tree
+%   prob_burning : initial chance of a cell being on fire
+function forest = init_forest(forest_rows,forest_cols,prob_tree,prob_burning)
     % create a random grid of doubles in the range (0,1)
     rand_grid = rand(forest_rows,forest_cols);
     % if value is less than tree probability, assign a one
@@ -84,8 +88,17 @@ end
 
 % controls the spread of the fire and returns EMTPY, TREE or BURNING
 % depending on the neighbors in the von Neumann neighborhood
-function forest = spread(forest,ext_forest,forest_rows,forest_cols,prob_immune, ...
-    prob_grow, prob_lightning, neighborhood_size, EMPTY, TREE, BURNING)
+% inputs:
+%   forest : current forest array
+%   ext_forest : forest array with padding for neighbor calculations
+%   forest_rows, forest_cols : size of simulated forest
+%   prob_immune : controls chances of trees to catch fire
+%   prob_grow : chance of an empty cell sprouting a new tree
+%   prob_lightning : chance of a lightning strike in a cell
+%   nbhd_size : neighborhood size. default is 4 (von neumann nbhd)
+%   EMPTY, TREE, BURNING : initialization constants
+function forest = spread(forest,ext_forest,forest_rows,forest_cols, ...
+    prob_immune,prob_grow,prob_lightning,nbhd_size,EMPTY,TREE,BURNING)
     % get the range of the extended grid with the padding of the extended
     % grid
     ext_forest_rows = forest_rows+2;
@@ -114,18 +127,17 @@ function forest = spread(forest,ext_forest,forest_rows,forest_cols,prob_immune, 
     
     % calculates array of all cells with no immunity and burning neighbors
     % note that a tree may or may not be in one of these cells
-    nonimmune_cells = (rand(forest_rows,forest_cols) < ((1- prob_immune)...
-        + (prob_immune / neighborhood_size) * burning_neighbors));
+    nonimmune_cells = (rand(forest_rows,forest_cols) < ((1 - prob_immune) ...
+        + (prob_immune / nbhd_size) * burning_neighbors));
     lightning_cells = (rand(forest_rows,forest_cols) < prob_lightning);
     
-    nonimmune_burning_cells = nonimmune_cells .* ((burning_neighbors > 0) ...
-        | lightning_cells);
+    nonimmune_burning_cells = nonimmune_cells .* ...
+        ((burning_neighbors > 0) | lightning_cells);
     
-    
-    % calculates all burning trees (1) and add it to the remaining trees to
+    % calculates all burning trees and add it to the remaining trees to
     % get all empty, tree or burning cells
-    forest = trees_remaining .* nonimmune_burning_cells + trees_remaining ...
-        + new_trees;      
+    forest = trees_remaining .* nonimmune_burning_cells ...
+        + trees_remaining + new_trees;      
 end
 
        
