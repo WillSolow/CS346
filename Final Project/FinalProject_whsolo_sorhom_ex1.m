@@ -8,6 +8,8 @@
 % based on the model that a tree will catch fire if its neighbors are on
 % fire
 
+% TO Run: press F5 and then call show_forest with forest_list, as arguments
+
 num_iterations = 50; % simulation length
 
 % Initializing Constants

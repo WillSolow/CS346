@@ -8,6 +8,8 @@
 % strikes, a spread function based off of the amount of trees burning
 % around it, and tree growth
 
+% TO Run: press F5 and then call show_forest with forest_list as arguments
+
 num_iterations = 50; % simulation length
 nbhd_size = 4; % neighborhood size (4 for von neumann, 8 for moore)
 

@@ -9,6 +9,9 @@
 % Additionally, we include lightning strikes, rainfall, and wind direction 
 % as in previous scripts
 
+% TO Run: press F5 and then call show_forest_age with forest_list,
+% burning_list and rainfall_on as arguments
+
 num_iterations = 50; % simulation length
 nbhd_size = 4; % neighborhood size (4 for von neumann, 8 for moore)
 

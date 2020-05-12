@@ -9,6 +9,9 @@
 % around it, and tree growth. Also, this simulation models steady wind from
 % a set direction and global rainfall
 
+% TO Run: press F5 and then call show_forest_rain with forest_list,
+% and rainfall_on as arguments
+
 num_iterations = 50; % simulation length
 nbhd_size = 4; % neighborhood size (4 for von neumann, 8 for moore)
 
