@@ -8,7 +8,7 @@
 % burn and burn for longer. Additionally, we include lightning strikes,
 % rainfall, and wind direction as in previous scripts
 
-num_iterations = 50;
+num_iterations = 200;
 nbhd_size = 4;
 
 % Initializing Constants
@@ -22,10 +22,8 @@ ANCIENT = 4; % the cell contains a large ancient tree
 prob_tree = .6;
 % the probability that a new tree grows
 prob_grow = .02;
-
 % the speed at which the forest grows 
 forest_growth = .1;
-
 % the age of the forest. In the range (0,1) 1 is all old trees 0 is all
 % saplings
 forest_age = .5;
@@ -53,8 +51,8 @@ rainfall_switches = [];
 rainfall_on(1) = 0;
 
 % width and length of forest
-forest_rows = 10; % height of the forest 
-forest_cols = 10; % width of the forest
+forest_rows = 500; % height of the forest 
+forest_cols = 500; % width of the forest
 x = 1:forest_rows;
 y = 1:forest_cols;
 
@@ -195,7 +193,7 @@ function [forest,burning] = spread(forest,burning,ext_burning,forest_rows,...
     % calculate tree growth based off of the rate of growth function and if
     % the cell is burning a tree or empty cannot grow
     tree_growth = (rand(forest_rows,forest_cols) < rate_of_growth(forest_growth,forest,ANCIENT)...
-        .* (~burning) .* (forest > 0));
+        .* (~burning) .* (forest ~= EMPTY));
     
     % trees are a sum of the trees that burnt plus the trees that grew and
     % the new saplings
